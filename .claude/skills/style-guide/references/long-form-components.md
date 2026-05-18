@@ -1,0 +1,418 @@
+# Long-Form Components
+
+Copy-paste-ready snippets for content shapes the marketing-style starter doesn't ship: explainer pages, technical primers, dense reference docs.
+
+All snippets reuse the existing tokens from `assets/index.html` (`--bg`, `--surface`, `--text`, `--text-muted`, `--border`, `--border-strong`, `--accent`, `--accent-soft`, `--space-1`..`--space-9`, `--radius`, `--radius-lg`, `--shadow-sm`, `--transition`). **Do not introduce new colour values.** If a component needs more visual weight, change the border thickness or background tint, not the palette.
+
+## How to use this file
+
+1. Open `assets/index.html` and find the `<style>` block.
+2. Paste the CSS for the components you need just **before** the final `@media (prefers-reduced-motion: reduce)` block.
+3. Paste the HTML where it belongs in the page.
+4. Don't paste components you aren't using — every extra rule is more surface area to maintain.
+
+## Section variants
+
+```css
+/* Narrower column for prose-heavy sections */
+.section-narrow .container { max-width: 820px; }
+
+/* Prose wrapper — caps line length, restores paragraph spacing */
+.prose { max-width: 68ch; }
+.prose p + p { margin-top: var(--space-4); }
+.prose .muted { color: var(--text-muted); }
+.prose code {
+  background: var(--surface);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+```
+
+```html
+<section class="section-narrow">
+  <div class="container">
+    <div class="prose stack">
+      <p>First paragraph.</p>
+      <p>Second paragraph, with a <code>token</code> reference.</p>
+    </div>
+  </div>
+</section>
+```
+
+## TL;DR card
+
+A one-paragraph summary block, always visible regardless of audience, sitting near the top of the page.
+
+```css
+.tldr {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+.tldr-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-3);
+}
+.tldr .lead {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.35;
+  margin-bottom: var(--space-5);
+  max-width: 60ch;
+}
+.tldr ul { margin: 0; padding-left: var(--space-5); color: var(--text-muted); }
+.tldr li + li { margin-top: var(--space-2); }
+```
+
+```html
+<div class="tldr">
+  <span class="tldr-label">TL;DR</span>
+  <h2 class="lead">One bold sentence the reader gets even if they read nothing else.</h2>
+  <ul>
+    <li>Takeaway one.</li>
+    <li>Takeaway two.</li>
+    <li>Takeaway three.</li>
+  </ul>
+</div>
+```
+
+## Callout
+
+Left-bordered tinted box for emphasis paragraphs — clarifications, common-misconception corrections, "the popular framing is wrong" asides.
+
+```css
+.callout {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  padding: var(--space-5);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+.callout h3 { margin-bottom: var(--space-2); }
+.callout p + p { margin-top: var(--space-3); }
+```
+
+```html
+<aside class="callout">
+  <h3>Heading for the callout</h3>
+  <p>The point the reader should take away.</p>
+</aside>
+```
+
+For more than two callout types (e.g. one for "the catch" and one for "the corollary"), vary the **border thickness** (4px vs. 2px) or the **icon** in the heading — not the colour. The one-accent rule still applies.
+
+## Comparison table
+
+A single side-by-side table is almost always better than two prose sections explaining variant A and variant B separately. Use this when the topic involves named variants the reader needs to compare row-by-row.
+
+```css
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+table.compare {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+table.compare th,
+table.compare td {
+  text-align: left;
+  padding: var(--space-4) var(--space-5);
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+table.compare thead th {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+table.compare tbody tr:last-child th,
+table.compare tbody tr:last-child td { border-bottom: 0; }
+table.compare th[scope="row"] {
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+table.compare td { color: var(--text-muted); }
+
+/* Optional pill for risk / status / verdict columns */
+.risk-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  background: var(--surface);
+}
+.risk-pill.high { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+```
+
+```html
+<div class="table-wrap">
+  <table class="compare">
+    <thead>
+      <tr>
+        <th scope="col">Variant</th>
+        <th scope="col">Property A</th>
+        <th scope="col">Property B</th>
+        <th scope="col">Verdict</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Variant 1</th>
+        <td>Property value</td>
+        <td>Property value</td>
+        <td><span class="risk-pill">Standard</span></td>
+      </tr>
+      <tr>
+        <th scope="row">Variant 2</th>
+        <td>Property value</td>
+        <td>Property value</td>
+        <td><span class="risk-pill high">Recommended</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+Keep tables under ~8 rows. If you have more, split into multiple smaller tables.
+
+## Audience switcher (radiogroup pattern)
+
+A segmented control that reveals practitioner-depth content. Uses ARIA `radiogroup` semantics with arrow-key navigation between segments — preferable to plain buttons for keyboard users.
+
+```css
+.audience-switch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px;
+  background: var(--surface);
+}
+.audience-switch [role="radio"] {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: var(--space-2) var(--space-3);
+  font-family: inherit;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+.audience-switch [role="radio"]:hover { color: var(--text); }
+.audience-switch [role="radio"][aria-checked="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Practitioner-only blocks default-hidden in exec view */
+body:not(.show-practitioner) .practitioner-only { display: none; }
+.practitioner-only {
+  border-left: 3px solid var(--accent);
+  padding: var(--space-4) var(--space-5);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  margin-top: var(--space-4);
+}
+.practitioner-only .pract-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-2);
+}
+.practitioner-only p + p { margin-top: var(--space-3); }
+.practitioner-only code {
+  background: var(--surface);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+```
+
+```html
+<div class="audience-switch" role="radiogroup" aria-label="Audience">
+  <button type="button" role="radio" data-audience="exec" aria-checked="true" tabindex="0">Executive</button>
+  <button type="button" role="radio" data-audience="practitioner" aria-checked="false" tabindex="-1">Practitioner</button>
+</div>
+```
+
+Use inline anywhere you need practitioner-only depth:
+
+```html
+<div class="practitioner-only">
+  <span class="pract-label">Practitioner</span>
+  <p>Depth content visible only in practitioner view.</p>
+</div>
+```
+
+JavaScript (add inside the existing IIFE in the template):
+
+```js
+const switchEl = document.querySelector('.audience-switch[role="radiogroup"]');
+if (switchEl) {
+  const radios = Array.from(switchEl.querySelectorAll('[role="radio"]'));
+  const apply = (mode) => {
+    document.body.classList.toggle('show-practitioner', mode === 'practitioner');
+    radios.forEach((r) => {
+      const isOn = r.dataset.audience === mode;
+      r.setAttribute('aria-checked', isOn ? 'true' : 'false');
+      r.setAttribute('tabindex', isOn ? '0' : '-1');
+    });
+    localStorage.setItem('audience', mode);
+  };
+  radios.forEach((r) => {
+    r.addEventListener('click', () => apply(r.dataset.audience));
+    r.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const idx = radios.indexOf(r);
+      const next = radios[(idx + (e.key === 'ArrowRight' ? 1 : radios.length - 1)) % radios.length];
+      next.focus();
+      apply(next.dataset.audience);
+    });
+  });
+  apply(localStorage.getItem('audience') || 'exec');
+}
+```
+
+If the page genuinely has no practitioner-only blocks, **don't ship the switcher** — a control that does nothing is a failure mode.
+
+## Inline-SVG diagram frame
+
+Hand-authored SVG wrapped in a `<figure>` with a caption. Use `currentColor` and `var(--accent)` for fills/strokes so the diagram tracks both themes automatically.
+
+```css
+.diagram-frame {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+.diagram-frame svg { display: block; width: 100%; height: auto; }
+.diagram-frame figcaption {
+  margin-top: var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+  text-align: center;
+}
+```
+
+```html
+<figure class="diagram-frame" aria-labelledby="diagram-caption">
+  <svg viewBox="0 0 720 360" role="img" xmlns="http://www.w3.org/2000/svg" aria-labelledby="diagram-caption">
+    <!-- Use currentColor for neutral strokes, var(--accent) for emphasis. -->
+    <rect x="40" y="40" width="200" height="60" rx="6" fill="var(--accent)" opacity="0.85"/>
+    <text x="140" y="76" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="700">Emphasis</text>
+    <rect x="280" y="40" width="200" height="60" rx="6" fill="currentColor" opacity="0.10"/>
+    <text x="380" y="76" font-size="14" fill="currentColor" text-anchor="middle">Neutral</text>
+  </svg>
+  <figcaption id="diagram-caption">Caption naming the diagram type and what it shows.</figcaption>
+</figure>
+```
+
+## Glossary (definition list)
+
+Two-column grid on wide viewports, single-column stacked on mobile. Covers both acronyms **and** multi-word terms of art used in the page — failing to define multi-word jargon ("address reuse", "trust domain", "exposure window") is a common gap.
+
+```css
+dl.glossary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5) var(--space-6);
+  margin: 0;
+}
+@media (min-width: 720px) {
+  dl.glossary { grid-template-columns: 220px 1fr; }
+}
+dl.glossary dt { font-weight: 700; color: var(--text); }
+dl.glossary dd { margin: 0; color: var(--text-muted); }
+@media (min-width: 720px) {
+  dl.glossary dt { padding-top: 2px; }
+}
+```
+
+```html
+<dl class="glossary">
+  <dt>Term</dt>
+  <dd>Definition. Keep to one or two sentences; link to a primary source in "Further reading" if the reader needs depth.</dd>
+
+  <dt>Another term</dt>
+  <dd>Definition.</dd>
+</dl>
+```
+
+## Reading-list
+
+A list of primary-source links with one-line annotations. Cards rather than bullets so the annotation has room to breathe.
+
+```css
+ul.reading {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+ul.reading li {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface);
+  transition: border-color var(--transition);
+}
+ul.reading li:hover { border-color: var(--border-strong); }
+ul.reading a {
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+ul.reading a svg { width: 14px; height: 14px; }
+ul.reading .note {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+```
+
+```html
+<ul class="reading">
+  <li>
+    <a href="https://example.org/spec" rel="noopener noreferrer" target="_blank">
+      Title of the primary source
+      <!-- Lucide: external-link -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </a>
+    <span class="note">One sentence saying why the reader would click this.</span>
+  </li>
+</ul>
+```
+
+Primary sources only — specs, regulator publications, original papers. Skip blog posts, vendor marketing, and Wikipedia summaries.

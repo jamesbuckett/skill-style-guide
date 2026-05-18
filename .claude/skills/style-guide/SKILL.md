@@ -18,6 +18,16 @@ Use whenever the user wants:
 
 Skip when the user explicitly asks for a multi-file framework build (React, Vue, Next, Svelte, etc.) — different problem.
 
+## Composition with other skills
+
+This skill is the **visual chassis** — palette, typography, spacing, components, the screenshot harness. When another skill applies to the same task (most commonly `build-educational-site` for long-form explainer pages), use this composition rule:
+
+- This skill wins on **palette, typography, spacing, components, icons, and validation**. The other skill's design system is overridden when it conflicts.
+- The other skill wins on **content architecture** — section sequence, audience switching, glossary discipline, comparison-table rule, regulatory-callout shape.
+- When the user explicitly names this skill ("using the style guide"), the precedence above is locked. When the user names the other skill instead and this one only ambiently applies, defer to the other skill's chassis unless asked otherwise.
+
+If the user wants long-form explainer content rendered with this skill's chassis, the reusable component CSS for callouts, comparison tables, glossary, reading lists, audience switchers, and inline-SVG diagram frames lives in `references/long-form-components.md` — copy what you need rather than re-authoring it.
+
 ## Workflow
 
 1. **Copy the starter template.** Begin every page by copying `assets/index.html` from this skill to the working directory as `index.html`. It already encodes the palette, font loading, dark-mode toggle behavior, personal branding row, and a typographic baseline. Customise from there — don't rebuild the chassis.
@@ -95,6 +105,30 @@ npm install --save-dev playwright
 npx playwright install chromium
 ```
 
+### When `npx playwright install chromium` fails
+
+Playwright does not ship Chromium binaries for every host. The known-broken combination is **Ubuntu 26.04 ARM64** (and other ARM64 Linux distros that Playwright hasn't tagged yet) — `npx playwright install chromium` exits with `Playwright does not support chromium on <platform>`. Snap install of `chromium` requires sudo. Spawning Windows-side `chrome.exe` via WSL interop fails the CDP bridge.
+
+Try, in order:
+
+1. **System chromium via apt (needs sudo, hand off to the user):**
+   ```bash
+   sudo apt install chromium-browser
+   # or, on snap-only distros:
+   sudo snap install chromium
+   ```
+   Then point Playwright at it explicitly:
+   ```bash
+   PLAYWRIGHT_BROWSERS_PATH=0 node screenshot.mjs ./index.html
+   ```
+   (and add `executablePath: '/usr/bin/chromium'` in the launch call inside `screenshot.mjs` if Playwright still can't find it).
+
+2. **CDP connect to a manually-launched Chrome:** start any Chromium-based browser with `--remote-debugging-port=9222 --headless=new`, then have the harness call `chromium.connectOverCDP('http://localhost:9222')` instead of `chromium.launch()`.
+
+3. **If no install is possible in this session**, hand off to the user with the exact install command and a note that the screenshot validation step is blocked until they run it. Run the static checks the harness would otherwise have caught (tag balance, no emoji, exactly one uncommented `--accent`, one HTML file) and report which validation steps were skipped.
+
+Do **not** silently skip the screenshot step. The whole point of this skill is visual validation; a blocked screenshot is a known limitation, not a passed check.
+
 ### Capture command
 
 ```bash
@@ -134,8 +168,23 @@ Confirm all four of these before telling the user the page is complete:
 3. The dark-mode toggle in the header works — clicking it flips `data-theme="dark"` on `<html>` and persists to `localStorage`.
 4. Latest `mobile.png`, `tablet.png`, and `desktop.png` exist in `./screenshots/` and reflect the design rules above.
 
+## Failure modes to avoid
+
+Patterns this skill is specifically trying to prevent — most are the AI-generic instincts the disciplined palette and spacing tokens exist to suppress.
+
+- **Generic AI aesthetic drift** — purple gradients, drop-shadow halos, rainbow toolbars, animated-on-load hero blocks. Crisp 1px borders and the curated accent are the entire visual language.
+- **Two accents instead of one** — switching `--accent` mid-build for variety. The one-accent rule is load-bearing for hierarchy. Add a `--state-*` variable for genuine state (PASS/FAIL, deprecated/recommended); never a second brand accent.
+- **Ad-hoc spacing values** — `padding: 17px`, `margin-top: 30px`, `gap: 14px`. Use the `--space-*` scale or extend it; don't bypass it. Cramped layouts and wasteful whitespace are both spacing failures.
+- **Hex codes in component CSS** — colours hard-coded outside the `:root` / `[data-theme="dark"]` blocks. Dark-mode parity breaks silently because the override never fires. Use the variables.
+- **Marketing-page bloat on a long-form page** — copying the starter's three-card feature grid into a page whose actual job is dense text. The starter is shaped for marketing; reach for `references/long-form-components.md` when the content is explanatory.
+- **Emoji in the rendered output** — easy to slip in via headings or bullet markers. Replace with the matching Lucide SVG. The page should look the same on a corporate machine with a stripped emoji font as on macOS.
+- **Skipping the mobile viewport** — a page that looks great at 1440px and breaks at 375px is a failed deliverable. Capture all three viewports every time.
+- **Silently bypassing the screenshot harness** — if `npx playwright install chromium` fails on this host, follow the fallback section above; do not declare the page complete with no visual validation and no note about it.
+- **More than three iteration cycles** — diminishing returns set in fast; if cycle 3 hasn't cleared the issue, stop and report the residual rather than grinding.
+
 ## Bundled resources
 
 - `assets/index.html` — starter compliant template. **Start here every time** rather than writing from scratch.
 - `scripts/screenshot.mjs` — Playwright capture harness for the three viewports.
 - `references/lucide-icons.md` — pre-fetched SVG snippets for common icons (sun, moon, github, twitter/x, linkedin, plus utility icons). Copy-paste ready.
+- `references/long-form-components.md` — copy-paste-ready CSS + HTML for components the starter doesn't ship: callout, comparison table, definition-list glossary, reading-list, audience switcher (radiogroup a11y), practitioner-only reveal, inline-SVG diagram frame, TL;DR card. All keyed to the existing CSS variables and spacing tokens — no new tokens introduced.
