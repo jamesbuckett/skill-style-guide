@@ -44,6 +44,8 @@ Read these before writing CSS. They override default 2025 design instincts.
 - `--border` light gray (`#E5E7EB`)
 - `--accent` exactly **one** restrained colour — pick from the curated set commented in the template (blue, emerald, or warm orange). Adding a second accent dilutes hierarchy; don't.
 
+**Brand accent vs. semantic state colours.** The one-accent rule applies to the *brand* — CTAs, links, highlights, anything that says "this is the page's voice." It does **not** apply to *semantic state* signals (success green, warning amber, danger red) when the content genuinely conveys state — e.g., a security scan with PASS / FAIL rows, a comparison contrasting a deprecated approach with a recommended one, a status badge. State colours should be restrained (one shade each, used only for the affected element + icon), kept separate from the accent variable (introduce `--state-ok`, `--state-warn`, `--state-bad` as needed), and absent from CTAs and headings. If a page has no genuine state to convey, don't reach for them.
+
 The dark palette is the same variables re-assigned under `[data-theme="dark"]`. Use the variables — never hard-code hex in component CSS.
 
 ### Typography
