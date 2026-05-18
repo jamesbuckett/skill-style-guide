@@ -39,12 +39,31 @@ const viewports = [
 const CSS_HEIGHT_CEILING = 5000;
 
 let browser;
+const fallbackPaths = [
+  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+  '/snap/bin/chromium',
+  '/usr/bin/chromium-browser',
+  '/usr/bin/chromium',
+].filter(Boolean);
 try {
   browser = await chromium.launch({ channel: 'chrome' });
   console.log('Browser: Google Chrome');
 } catch {
-  browser = await chromium.launch();
-  console.log('Browser: bundled Chromium (Chrome not found)');
+  try {
+    browser = await chromium.launch();
+    console.log('Browser: bundled Chromium');
+  } catch {
+    let launched = false;
+    for (const executablePath of fallbackPaths) {
+      try {
+        browser = await chromium.launch({ executablePath });
+        console.log(`Browser: ${executablePath}`);
+        launched = true;
+        break;
+      } catch {}
+    }
+    if (!launched) throw new Error('No Chrome/Chromium found. Install via `sudo snap install chromium` or set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.');
+  }
 }
 
 try {
