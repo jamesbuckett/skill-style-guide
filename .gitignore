@@ -1,0 +1,16 @@
+# Skill eval artifacts (transient outputs from skill-creator runs)
+.claude/skills/style-guide-workspace/
+
+# Build / dependency outputs
+node_modules/
+package-lock.json
+package.json
+
+# Screenshot output from screenshot.mjs (regenerated per run)
+screenshots/
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+.idea/
+*.swp

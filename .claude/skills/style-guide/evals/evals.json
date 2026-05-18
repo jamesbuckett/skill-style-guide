@@ -1,0 +1,26 @@
+{
+  "skill_name": "style-guide",
+  "evals": [
+    {
+      "id": 0,
+      "name": "drift-scout-landing",
+      "prompt": "Build me a single-file HTML landing page for an open-source CLI tool called 'Drift Scout'. It scans a directory of Kubernetes manifests for security drift (e.g. images pulled from disallowed registries, missing securityContext blocks, capabilities that violate baseline policies). The page should have: a hero with the product name + a one-line tagline + a primary CTA + a secondary 'View on GitHub' link, three feature cards (manifest scanning, policy-as-code, CI integration), a short code snippet showing the install + a sample command, and a footer. Output just the .html file.",
+      "expected_output": "A single index.html file with a hero, 3 feature cards, a code snippet, and a footer. Should follow the style-guide rules (light default, Noto Sans, Lucide icons inline, dark-mode toggle, branding links, no Tailwind/Bootstrap, etc.)",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "personal-bio",
+      "prompt": "Make me a personal about/bio page. I'm an Executive Director in Product Management at JP Morgan Chase, focused on Infrastructure Platforms — cloud, enterprise security architecture, platform engineering, and financial-services regulatory frameworks (PCI-DSS, DORA, MAS TRM, APRA CPS 234). The page should include: a short hero with my name and one-line role, a 2-paragraph bio, three highlighted focus areas (cloud security architecture, regulatory frameworks, platform engineering), and prominent contact links to my GitHub, Twitter/X, and LinkedIn. Single HTML file, light theme.",
+      "expected_output": "A single index.html with hero, bio, three focus-area cards, and personal branding links. Should hit all the style-guide rules.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "c4-calm-explainer",
+      "prompt": "Build a single-file HTML explainer page comparing the C4 model with FINOS CALM (Common Architecture Language Model), aimed at senior engineers at a Tier 1 bank. Include: a hero stating the thesis ('C4 for humans, CALM for machines, used together'), a side-by-side comparison section with one card per framework, a short 'how they compose' section with a 4-step lifecycle (design / specify / validate / communicate), and a comparison table covering: representation, primary audience, machine-validatable, tooling, suited for. Lean technical, don't dumb it down. Single .html file.",
+      "expected_output": "A content-dense single-file HTML page with hero, two-card comparison, lifecycle section, and a comparison table — all matching the style-guide rules.",
+      "files": []
+    }
+  ]
+}

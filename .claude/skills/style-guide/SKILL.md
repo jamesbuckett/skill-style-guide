@@ -1,0 +1,139 @@
+---
+name: style-guide
+description: Build single-file HTML pages that follow James Buckett's personal style guide — light theme with dark-mode toggle, Noto Sans / Noto Sans Mono typography, Lucide icons inlined as SVG, a disciplined 4/8/12/16/24/32/48/64 spacing scale, exactly one accent color, personal branding links, and Playwright screenshot validation across mobile/tablet/desktop. Use this skill whenever the user asks for a landing page, marketing page, prototype, mockup, single-file HTML page, or to edit an existing index.html in this project, even when they don't explicitly mention the style guide. Skip only if the user explicitly wants a multi-file build (React, Vue, Next, etc.).
+---
+
+# Single-File HTML Style Guide
+
+This skill produces premium, minimalist single-file HTML pages and verifies them visually with screenshots.
+
+The constraints — one file, no build step, light theme, restrained palette, mandatory screenshot validation — are deliberate. They keep the output portable (double-click to render), fast to share, and resistant to drifting into generic AI aesthetics (purple gradients, drop-shadow soup, rounded-card spam, emoji bullets).
+
+## When to use this skill
+
+Use whenever the user wants:
+- A landing page, marketing page, docs page, or visual prototype
+- A modification to an existing `index.html` in this project
+- Any output described as "a single HTML file" or "self-contained webpage"
+
+Skip when the user explicitly asks for a multi-file framework build (React, Vue, Next, Svelte, etc.) — different problem.
+
+## Workflow
+
+1. **Copy the starter template.** Begin every page by copying `assets/index.html` from this skill to the working directory as `index.html`. It already encodes the palette, font loading, dark-mode toggle behavior, personal branding row, and a typographic baseline. Customise from there — don't rebuild the chassis.
+
+2. **Edit `index.html` to satisfy the request.** Keep everything in one file. Reach for the spacing tokens (`--space-*`), color variables (`--bg`, `--surface`, `--text`, `--text-muted`, `--border`, `--accent`), and component patterns already in the template. Adding ad-hoc colors or one-off margin values is the fast path to incoherence.
+
+3. **Verify visually.** Run the screenshot harness — see "Screenshot iteration loop" below. CSS bugs hide in plain sight when you only read the code; the screenshots catch overflow, font fallback, contrast failures, and AI-generic drift.
+
+4. **Iterate up to 3 cycles** or until the design satisfies the rules below — whichever comes first. Diminishing returns set in fast; don't polish past the point of improvement.
+
+## Design rules
+
+Read these before writing CSS. They override default 2025 design instincts.
+
+### Theme
+- **Light by default.** The page renders in the light palette on first load. Dark mode is opt-in via a toggle in the header that flips a `data-theme` attribute on `<html>`. On first visit, honour `prefers-color-scheme: dark` only if no explicit user preference is stored in `localStorage`. The pattern is wired in the template — don't reinvent it.
+- **No gradient hero backgrounds.** No drop-shadow halos. No purple. Crisp 1px borders and a single soft elevation shadow are enough.
+
+### Palette (light, defined as CSS variables in the template)
+- `--bg` near-white (`#FAFAFA`)
+- `--surface` pure white (`#FFFFFF`) for cards and elevated panels
+- `--text` near-black (`#0A0A0A`)
+- `--text-muted` mid-gray (`#6B7280`)
+- `--border` light gray (`#E5E7EB`)
+- `--accent` exactly **one** restrained colour — pick from the curated set commented in the template (blue, emerald, or warm orange). Adding a second accent dilutes hierarchy; don't.
+
+The dark palette is the same variables re-assigned under `[data-theme="dark"]`. Use the variables — never hard-code hex in component CSS.
+
+### Typography
+- **Noto Sans** (400 regular, 700 bold) for body and headings, **Noto Sans Mono** for code. Loaded via the Google Fonts `<link>` already in the template head.
+- Body 18px, monospace 14px. Headings use tight letter-spacing (`-0.02em`). Body line-height 1.5–1.7.
+- Hero headings use `clamp()` so they scale with viewport rather than relying on breakpoints alone.
+- System fonts remain in the stack as fallbacks for offline rendering — keep them.
+
+### Spacing
+Use the spacing tokens defined in the template: `--space-1` (4px) through `--space-9` (96px), mapped to the 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 px scale. Don't introduce arbitrary values like `padding: 17px` or `margin-top: 30px`. Cramped layouts and wasteful white space are equally bad — the scale is the discipline that prevents both.
+
+### Icons
+**Lucide SVG inlined directly into HTML.** Don't load the Lucide CDN script or use icon fonts — paste the SVG markup. Common icons (sun, moon, github, twitter/x, linkedin, chevron, check, arrow, external-link) are in `references/lucide-icons.md` ready to copy. Replace any emoji with the equivalent Lucide glyph; never ship emojis in production output.
+
+### Personal branding
+The hero or header must include three links (already wired in the template, with Lucide icons):
+- GitHub: `https://github.com/jamesbuckett`
+- Twitter/X: `https://twitter.com/jamesbuckett`
+- LinkedIn: `https://www.linkedin.com/in/jamesbuckett`
+
+Render as a horizontal row of icon badges (icon + accessible label). Keep them present on every page — even an internal mockup.
+
+### Interaction and motion
+- Transitions 150–250ms, purposeful only — hover state, focus ring, theme toggle. No flashy entrance animations.
+- Visible focus rings on every interactive element. The template's `:focus-visible` style is the reference; don't strip it.
+- Respect `prefers-reduced-motion: reduce` — wrap any non-essential animation in that media query.
+
+### Code structure
+- One `<style>` block in `<head>` using CSS variables, CSS Grid, and Flexbox. No CSS frameworks (no Tailwind, Bootstrap, Bulma). The only permitted external stylesheet is the Google Fonts `<link>`.
+- One `<script>` at the end of `<body>` — modern vanilla JS, no jQuery, no framework bundles, no CDN scripts (Lucide CDN script is also out — inline the SVG).
+- Semantic HTML5 elements: `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`. Use them where they make sense; don't wrap every div in `<section>`.
+- Valid HTML5: `<!DOCTYPE html>`, `<meta charset="utf-8">`, `<meta name="viewport" content="width=device-width, initial-scale=1">`, a meaningful `<title>`, and a `<meta name="description">`.
+
+## Screenshot iteration loop
+
+The harness at `scripts/screenshot.mjs` uses Playwright to capture three viewports. It is the load-bearing verification step of this skill — do not skip it for efficiency. Visual validation is the entire point.
+
+### Setup (once per project)
+
+```bash
+# Copy the harness to the project root
+cp <skill-path>/scripts/screenshot.mjs ./
+
+# Install Playwright if it's not already installed
+npm init -y 2>/dev/null
+npm install --save-dev playwright
+npx playwright install chromium
+```
+
+### Capture command
+
+```bash
+node screenshot.mjs ./index.html
+```
+
+This writes three PNGs to `./screenshots/`:
+- `mobile.png` — 375 × 812 (iPhone-ish)
+- `tablet.png` — 768 × 1024 (iPad portrait)
+- `desktop.png` — 1440 × 900 (standard laptop)
+
+For tall pages the harness automatically slices the capture to stay under Chrome's canvas limit. You don't need to flag this manually.
+
+### One iteration cycle
+
+1. **Capture.** Run the command above.
+2. **Look.** View all three screenshots with the Read tool. Write a short critique covering: typography hierarchy, color cohesion, spacing rhythm, responsive breakpoints, drift toward generic AI aesthetics (purple, gradients, rounded-card spam), and rendering bugs (overflow, broken layout, contrast failures, font fallback to system sans).
+3. **Pick the top 2–3 changes** by visual impact. Apply them by editing `index.html` only.
+4. **Re-capture and compare.** State explicitly what improved and what regressed compared to the previous set.
+
+### Stopping rule
+
+Up to 3 cycles, or earlier when the design meets the rules above. After 3 cycles, stop and report what's left — don't grind into low-value polish.
+
+### Non-negotiables
+
+- **Mobile is a first-class deliverable.** Never skip the mobile viewport. A page that looks great at 1440px and breaks at 375px is a failed deliverable.
+- **Don't bypass the harness.** If `screenshot.mjs` errors, fix the harness or the page — don't skip the step.
+- **Edit only `index.html`** during the loop. Don't touch the harness or unrelated files unless explicitly asked.
+
+## Verify before reporting done
+
+Confirm all four of these before telling the user the page is complete:
+
+1. Output is a single `.html` file (no extra `.css`, `.js`, or asset files sitting alongside it).
+2. The default load is light — open the file fresh in a private window and the first paint is the light palette.
+3. The dark-mode toggle in the header works — clicking it flips `data-theme="dark"` on `<html>` and persists to `localStorage`.
+4. Latest `mobile.png`, `tablet.png`, and `desktop.png` exist in `./screenshots/` and reflect the design rules above.
+
+## Bundled resources
+
+- `assets/index.html` — starter compliant template. **Start here every time** rather than writing from scratch.
+- `scripts/screenshot.mjs` — Playwright capture harness for the three viewports.
+- `references/lucide-icons.md` — pre-fetched SVG snippets for common icons (sun, moon, github, twitter/x, linkedin, plus utility icons). Copy-paste ready.
