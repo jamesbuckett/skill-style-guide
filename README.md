@@ -122,6 +122,53 @@ Once installed, you don't need to name it — its description triggers on prompt
 
 Claude will copy the starter template, customise it, run the screenshot harness, view the captures, critique, and iterate up to three cycles. Skip explicitly only when you want a multi-file framework build (React, Vue, Next, etc.).
 
+### Worked example
+
+A full end-to-end run from an empty directory:
+
+```bash
+# 1. New project, skill already installed user-scoped (see Option B above)
+mkdir drift-scout && cd drift-scout
+
+# 2. Set up the screenshot harness (once per project)
+cp ~/.claude/skills/style-guide/scripts/screenshot.mjs ./
+npm init -y && npm install --save-dev playwright
+npx playwright install chromium
+
+# 3. Open Claude Code and prompt it
+claude
+```
+
+In the Claude Code session:
+
+> Build a landing page for "Drift Scout" — a config-drift detector for Kubernetes clusters. Hero should pitch the product in one sentence, then three feature cards covering detection, alerting, and reporting. Use the emerald accent.
+
+What Claude does, in order:
+
+1. **Invokes the `style-guide` skill** — its description matches "landing page" and "single-file HTML".
+2. **Copies `assets/index.html`** from the skill to `./index.html` as the starting chassis.
+3. **Customises it** — replaces brand name, hero copy, and three feature cards. Swaps the `--accent` variable to the emerald hex from the curated palette. Pulls icons (`shield-check`, `bell`, `bar-chart-3`) from `references/lucide-icons.md` and inlines them as SVG.
+4. **Runs the harness** — `node screenshot.mjs ./index.html` writes `mobile.png`, `tablet.png`, `desktop.png` into `./screenshots/`.
+5. **Views all three captures with the Read tool**, writes a short critique (typography hierarchy, accent cohesion, mobile overflow, any drift toward generic AI aesthetics), and picks the top 2–3 fixes.
+6. **Iterates up to 3 cycles** — re-edits `index.html`, re-captures, reports what improved vs. regressed.
+7. **Verifies completion** — confirms first paint is light, the dark-mode toggle persists to `localStorage`, three viewport screenshots exist, and the output is a single `.html` file with no sibling assets.
+
+Output you can expect on disk:
+
+```
+drift-scout/
+├── index.html              # the page Claude built
+├── screenshots/            # gitignored; regenerated per harness run
+│   ├── mobile.png
+│   ├── tablet.png
+│   └── desktop.png
+├── screenshot.mjs
+├── node_modules/
+└── package.json
+```
+
+Double-click `index.html` to view it. To iterate further, ask Claude for a specific change ("tighten the spacing under the hero CTA", "swap to the orange accent") — it will re-edit and re-screenshot rather than starting over.
+
 ## Requirements
 
 | Component | Version | Notes |
