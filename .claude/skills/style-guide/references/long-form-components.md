@@ -416,3 +416,140 @@ ul.reading .note {
 ```
 
 Primary sources only — specs, regulator publications, original papers. Skip blog posts, vendor marketing, and Wikipedia summaries.
+
+## Sticky left-side TOC
+
+For long-form pages (six or more sections, or scrolls past three viewport heights on desktop) running a centered narrow container, a sticky left-side TOC orients the reader and supports in-page jumps. It anchors into the left whitespace that exists when the container is narrower than the viewport, and hides on smaller viewports so it doesn't crowd the narrow text column.
+
+Uses `IntersectionObserver` to highlight the section currently in view. The `scroll-margin-top` rule on `section` is load-bearing — without it, clicking a TOC link scrolls the section heading directly under the sticky header.
+
+```css
+.toc {
+  display: none;
+  position: fixed;
+  top: 96px;
+  left: max(var(--space-5), calc((100vw - var(--max-width)) / 2 - 220px));
+  width: 220px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-2);
+  z-index: 5;
+}
+@media (min-width: 1280px) { .toc { display: block; } }
+.toc-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.toc ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 1px solid var(--border);
+}
+.toc li { margin: 0; }
+.toc a {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  line-height: 1.4;
+  transition: color var(--transition), border-color var(--transition), background-color var(--transition);
+}
+.toc a:hover {
+  color: var(--text);
+  border-left-color: var(--border-strong);
+}
+.toc a.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 700;
+}
+
+/* Required for anchor-link clicks not to get covered by the sticky header */
+section { scroll-margin-top: 80px; }
+```
+
+```html
+<nav class="toc" aria-label="On this page">
+  <span class="toc-label">On this page</span>
+  <ol>
+    <li><a href="#first-section-id">First section</a></li>
+    <li><a href="#second-section-id">Second section</a></li>
+    <!-- one li per major section heading -->
+  </ol>
+</nav>
+```
+
+JavaScript (add inside the existing IIFE in the template):
+
+```js
+const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+if (tocLinks.length && 'IntersectionObserver' in window) {
+  const linkMap = new Map();
+  tocLinks.forEach((link) => {
+    const id = link.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) linkMap.set(target, link);
+  });
+  const setActive = (link) => {
+    tocLinks.forEach((l) => l.classList.toggle('is-active', l === link));
+  };
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((e) => e.isIntersecting)
+      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+    if (visible[0]) {
+      const link = linkMap.get(visible[0].target);
+      if (link) setActive(link);
+    }
+  }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+  linkMap.forEach((_, target) => observer.observe(target));
+}
+```
+
+Don't ship the TOC on short pages (under six sections, or scrolling under three viewport heights on desktop) — it adds chrome without adding value.
+
+## Compact diagram-frame variant
+
+When a comparison page covers named variants whose *architectural shape* differs in load-bearing ways, embed a small inline-SVG diagram inside each variant's card — between the description prose and the bullet list. The page-level architecture diagram still leads with the *generic* shape; per-variant diagrams show how each one departs from it.
+
+This variant trims padding from the default `.diagram-frame` so the diagram sits comfortably inside a card without competing for visual weight, and switches the background to `--bg` so it reads as inset rather than elevated.
+
+```css
+.diagram-frame.compact {
+  padding: var(--space-5);
+  background: var(--bg);
+  margin-top: var(--space-5);
+}
+.diagram-frame.compact figcaption {
+  margin-top: var(--space-3);
+  font-size: 13px;
+}
+```
+
+```html
+<figure class="diagram-frame compact" aria-labelledby="diag-variant-cap">
+  <svg viewBox="0 0 720 230" role="img" xmlns="http://www.w3.org/2000/svg" aria-labelledby="diag-variant-cap">
+    <!-- Emphasis boxes use var(--accent); neutral boxes/arrows use currentColor. -->
+    <rect x="130" y="80" width="240" height="100" rx="6" fill="var(--accent)" opacity="0.10" stroke="var(--accent)"/>
+    <rect x="430" y="60" width="120" height="40" rx="5" fill="currentColor" opacity="0.08" stroke="currentColor"/>
+    <!-- ... -->
+  </svg>
+  <figcaption id="diag-variant-cap">One-sentence statement of the architectural point this diagram makes — not a generic "Architecture of X" caption.</figcaption>
+</figure>
+```
+
+Sizing guidance: a `viewBox` around 720×230 fits comfortably inside vendor/variant cards in a `.container-narrow` (max-width 860px). Push up to 720×260 only if the diagram genuinely needs the vertical room.
+
+Theme tracking: use `fill="currentColor"` and `stroke="currentColor"` with low opacity (0.06–0.10) for neutral elements; `fill="var(--accent)"` with stronger opacity (0.55–0.92) for emphasis. Dark mode then re-paints automatically — no separate dark-theme variant needed.
+
+Captions earn their place: name the architectural point in one sentence (e.g., "vendor-hosted SaaS control plane handles policy; customer-deployed gateways hold credentials"), not a generic title. The caption is the diagram's headline — it carries the meaning on mobile when the SVG text shrinks to the limit of readability.
