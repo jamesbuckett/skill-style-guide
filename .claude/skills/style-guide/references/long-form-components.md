@@ -421,6 +421,8 @@ Primary sources only — specs, regulator publications, original papers. Skip bl
 
 For long-form pages (six or more sections, or scrolls past three viewport heights on desktop) running a centered narrow container, a sticky left-side TOC orients the reader and supports in-page jumps. It anchors into the left whitespace that exists when the container is narrower than the viewport, and hides on smaller viewports so it doesn't crowd the narrow text column.
 
+**Prerequisite — every top-level `<section>` on the page must use the narrow container.** The TOC's `left` math reserves a fixed-width gutter on the assumption that the visible content column matches the narrow width. Any section that falls back to the default `--max-width` will slide leftward into that gutter and underlap the TOC at `>=1280px`. Apply `.section-narrow` (the Section variants block earlier in this file) to *every* `<section>`, including the hero — it is easy to miss because the hero is usually authored last and visually distinct. Safer alternative for pages where no section needs the wider default: drop `.section-narrow` and apply the narrow width to `.container` directly, so it can't be skipped by forgetting a class.
+
 Uses `IntersectionObserver` to highlight the section currently in view. The `scroll-margin-top` rule on `section` is load-bearing — without it, clicking a TOC link scrolls the section heading directly under the sticky header.
 
 ```css
