@@ -195,6 +195,8 @@ Patterns this skill is specifically trying to prevent — most are the AI-generi
 - `scripts/validate.mjs` — static linter. Encodes the design rules as exit-coded checks; run after every edit and before reporting done. Zero dependencies.
 - `scripts/a11y.mjs` — axe-core WCAG AA scan + dark-mode parity probe. Requires `@axe-core/playwright`.
 - `scripts/run-evals.mjs` — skill maintainer tool. Runs the prompts in `evals/evals.json` through `claude -p` end-to-end, then validates and LLM-judges each output. Use to measure skill drift between SKILL.md changes.
+- `scripts/hook-post-edit.mjs` + `scripts/hook-stop.mjs` — optional Claude Code hooks. The first auto-runs `validate.mjs` after any `*.html` edit; the second blocks "I'm done" responses until both validation and the three screenshots are present. Wire them via `assets/settings.json.example`. See the README's *Hooks (optional)* section.
+- `assets/settings.json.example` — drop-in `.claude/settings.json` fragment that activates the two hooks above in any consumer project.
 - `scripts/_launch.mjs` — internal helper; the Chromium launch fallback chain shared between `screenshot.mjs` and `a11y.mjs`.
 - `references/lucide-icons.md` — pre-fetched SVG snippets for common icons (sun, moon, github, twitter/x, linkedin, plus utility icons). Copy-paste ready.
 - `references/long-form-components.md` — copy-paste-ready CSS + HTML for components the starter doesn't ship: callout, comparison table, definition-list glossary, reading-list, audience switcher (radiogroup a11y), practitioner-only reveal, inline-SVG diagram frame, TL;DR card. All keyed to the existing CSS variables and spacing tokens — no new tokens introduced.

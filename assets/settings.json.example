@@ -1,0 +1,28 @@
+{
+  "_comment": "Drop-in .claude/settings.json fragment for skill-style-guide. Copy to .claude/settings.json in any project where you build a style-guide page; merge the `hooks` block into an existing settings.json if you already have one. The helper scripts live with the skill so updates flow via `git pull`.",
+
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.claude/skills/skill-style-guide/scripts/hook-post-edit.mjs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.claude/skills/skill-style-guide/scripts/hook-stop.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}

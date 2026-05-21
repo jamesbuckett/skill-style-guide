@@ -123,13 +123,46 @@ The skill activates on any of these phrasings, even without naming it:
 
 Skip only when you explicitly want a multi-file build (React, Vue, Next, etc.).
 
+## Hooks (optional)
+
+Two Claude Code hooks turn the validators from "remember to run them" into automatic guardrails. They live in the consumer project's `.claude/settings.json`; the helper scripts they invoke live in the skill repo, so `git pull` keeps them current.
+
+- **PostToolUse** — after every `Edit` / `Write` / `MultiEdit` against a `*.html` file, runs `validate.mjs` on it. If any rule fails, the violations are fed back to Claude as a tool result and Claude self-corrects before the next user message.
+- **Stop** — when Claude tries to finish a response in a project that contains `./index.html`, blocks completion unless `validate.mjs` exits clean *and* the three screenshots (`mobile.png`, `tablet.png`, `desktop.png`) exist under `./screenshots/`. The block reason names the missing pieces so Claude knows what to do next. Skipped silently in projects without an `./index.html` (so non-style-guide projects aren't affected).
+
+### Install
+
+```bash
+cd <your-project>
+mkdir -p .claude
+cp ~/.claude/skills/skill-style-guide/assets/settings.json.example .claude/settings.json
+```
+
+If `.claude/settings.json` already exists, merge the `hooks` block from `assets/settings.json.example` into your existing file rather than overwriting. Both hooks are top-level under `hooks` and won't conflict with permissions, env, or other settings.
+
+### Verify
+
+```bash
+# Should be silent (exit 0) — the clean starter passes.
+echo '{"tool_name":"Edit","tool_input":{"file_path":"'"$PWD/index.html"'"}}' \
+  | node ~/.claude/skills/skill-style-guide/scripts/hook-post-edit.mjs
+
+# Should print a decision:block JSON listing missing screenshots.
+echo '{}' | node ~/.claude/skills/skill-style-guide/scripts/hook-stop.mjs
+```
+
+### Disable temporarily
+
+Comment out the relevant block in `.claude/settings.json`, or move the file aside (`mv .claude/settings.json .claude/settings.json.off`). Both hooks no-op silently when the consumer project doesn't have `./index.html`, so checking out a non-style-guide branch already disables them effectively.
+
 ## Project Structure
 
 ```
 skill-style-guide/
 ├── SKILL.md                          # the skill definition Claude Code loads
 ├── assets/
-│   └── index.html                    # starter template — palette, fonts, dark toggle, branding row
+│   ├── index.html                    # starter template — palette, fonts, dark toggle, branding row
+│   └── settings.json.example         # drop-in .claude/settings.json fragment for the hooks
 ├── references/
 │   ├── lucide-icons.md               # copy-paste Lucide SVG snippets
 │   └── long-form-components.md       # callouts, comparison tables, glossary, TOC, diagram frames
@@ -138,6 +171,8 @@ skill-style-guide/
 │   ├── validate.mjs                  # static linter — enforces design rules, zero deps
 │   ├── a11y.mjs                      # axe-core WCAG AA scan + dark-mode parity probe
 │   ├── run-evals.mjs                 # skill maintainer harness — runs evals end-to-end
+│   ├── hook-post-edit.mjs            # PostToolUse hook — auto-runs validate.mjs on *.html edits
+│   ├── hook-stop.mjs                 # Stop hook — blocks completion until verify-before-done passes
 │   └── _launch.mjs                   # shared Chromium launcher (internal)
 └── evals/
     ├── evals.json                    # skill evaluation prompts and expected outputs
