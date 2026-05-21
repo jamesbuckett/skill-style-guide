@@ -42,6 +42,23 @@ node ~/.claude/skills/skill-style-guide/scripts/a11y.mjs ./index.html
 
 The first install also needs Playwright in the consumer project (`npm install --save-dev playwright @axe-core/playwright && npx playwright install chromium`). See [`SKILL.md`](SKILL.md) for the full workflow, the optional PostToolUse / Stop hooks that automate validation, and fallbacks when `npx playwright install` fails on your host.
 
+## Hooks (optional)
+
+Two Claude Code hooks turn the validators from "remember to run them" into automatic guardrails. They live in the consumer project's `.claude/settings.json`; the helper scripts they invoke live in the skill repo, so `git pull` keeps them current.
+
+- **PostToolUse** — after every `Edit` / `Write` / `MultiEdit` against a `*.html` file, runs `validate.mjs` on it. If any rule fails, the violations are fed back to Claude as a tool result and Claude self-corrects before the next user message.
+- **Stop** — when Claude tries to finish a response in a project that contains `./index.html`, blocks completion unless `validate.mjs` exits clean *and* the three screenshots (`mobile.png`, `tablet.png`, `desktop.png`) exist under `./screenshots/`. The block reason names the missing pieces so Claude knows what to do next. Skipped silently in projects without an `./index.html`.
+
+Install:
+
+```bash
+cd <your-project>
+mkdir -p .claude
+cp ~/.claude/skills/skill-style-guide/assets/settings.json.example .claude/settings.json
+```
+
+If `.claude/settings.json` already exists, merge the `hooks` block from `assets/settings.json.example` into your existing file rather than overwriting. To disable temporarily, comment out the relevant block or move the file aside (`mv .claude/settings.json .claude/settings.json.off`).
+
 ## Project Structure
 
 ```text
