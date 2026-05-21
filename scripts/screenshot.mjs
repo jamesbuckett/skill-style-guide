@@ -1,7 +1,7 @@
-import { chromium } from 'playwright';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import { launchBrowser } from './_launch.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -95,33 +95,8 @@ function printHelp() {
 // Browser launch — Chrome, then bundled Chromium, then system fallback paths.
 // -----------------------------------------------------------------------------
 
-let browser;
-const fallbackPaths = [
-  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
-  '/snap/bin/chromium',
-  '/usr/bin/chromium-browser',
-  '/usr/bin/chromium',
-].filter(Boolean);
-try {
-  browser = await chromium.launch({ channel: 'chrome' });
-  console.log('Browser: Google Chrome');
-} catch {
-  try {
-    browser = await chromium.launch();
-    console.log('Browser: bundled Chromium');
-  } catch {
-    let launched = false;
-    for (const executablePath of fallbackPaths) {
-      try {
-        browser = await chromium.launch({ executablePath });
-        console.log(`Browser: ${executablePath}`);
-        launched = true;
-        break;
-      } catch {}
-    }
-    if (!launched) throw new Error('No Chrome/Chromium found. Install via `sudo snap install chromium` or set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.');
-  }
-}
+const { browser, label: browserLabel } = await launchBrowser();
+console.log(`Browser: ${browserLabel}`);
 
 // -----------------------------------------------------------------------------
 // Capture loop

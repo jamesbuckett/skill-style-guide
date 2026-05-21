@@ -9,6 +9,9 @@ package.json
 # Screenshot output from screenshot.mjs (regenerated per run)
 screenshots/
 
+# Eval run reports from scripts/run-evals.mjs (timestamped per run)
+evals/results/
+
 # Editor / OS noise
 .DS_Store
 .vscode/

@@ -166,12 +166,13 @@ Up to 3 cycles, or earlier when the design meets the rules above. After 3 cycles
 
 ## Verify before reporting done
 
-Confirm all four of these before telling the user the page is complete:
+Confirm all of these before telling the user the page is complete:
 
-1. Output is a single `.html` file (no extra `.css`, `.js`, or asset files sitting alongside it).
+1. `node ~/.claude/skills/skill-style-guide/scripts/validate.mjs ./index.html` exits clean (no errors). This subsumes "single-file" and the static rules — palette variables, spacing scale, one accent, branding links, no emoji, no Tailwind.
 2. The default load is light — open the file fresh in a private window and the first paint is the light palette.
 3. The dark-mode toggle in the header works — clicking it flips `data-theme="dark"` on `<html>` and persists to `localStorage`.
 4. Latest `mobile.png`, `tablet.png`, and `desktop.png` exist in `./screenshots/` and reflect the design rules above.
+5. *(Optional, when `@axe-core/playwright` is installed)* `node ~/.claude/skills/skill-style-guide/scripts/a11y.mjs ./index.html` exits clean — catches contrast failures, missing focus rings, and broken dark-mode parity (a hex hardcoded in component CSS where a variable should be).
 
 ## Failure modes to avoid
 
@@ -191,5 +192,9 @@ Patterns this skill is specifically trying to prevent — most are the AI-generi
 
 - `assets/index.html` — starter compliant template. **Start here every time** rather than writing from scratch.
 - `scripts/screenshot.mjs` — Playwright capture harness for the three viewports.
+- `scripts/validate.mjs` — static linter. Encodes the design rules as exit-coded checks; run after every edit and before reporting done. Zero dependencies.
+- `scripts/a11y.mjs` — axe-core WCAG AA scan + dark-mode parity probe. Requires `@axe-core/playwright`.
+- `scripts/run-evals.mjs` — skill maintainer tool. Runs the prompts in `evals/evals.json` through `claude -p` end-to-end, then validates and LLM-judges each output. Use to measure skill drift between SKILL.md changes.
+- `scripts/_launch.mjs` — internal helper; the Chromium launch fallback chain shared between `screenshot.mjs` and `a11y.mjs`.
 - `references/lucide-icons.md` — pre-fetched SVG snippets for common icons (sun, moon, github, twitter/x, linkedin, plus utility icons). Copy-paste ready.
 - `references/long-form-components.md` — copy-paste-ready CSS + HTML for components the starter doesn't ship: callout, comparison table, definition-list glossary, reading-list, audience switcher (radiogroup a11y), practitioner-only reveal, inline-SVG diagram frame, TL;DR card. All keyed to the existing CSS variables and spacing tokens — no new tokens introduced.

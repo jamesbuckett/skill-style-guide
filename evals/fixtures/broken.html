@@ -1,0 +1,45 @@
+<html data-theme="dark">
+<head>
+  <title>Broken Fixture</title>
+  <!-- Deliberately omitted: <!doctype>, <meta charset>, <meta viewport>,
+       <meta name="description">, lang="" on <html>. Each absence is a
+       separate validate.mjs rule. -->
+
+  <!-- no-framework violations -->
+  <link rel="stylesheet" href="https://cdn.tailwindcss.com">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- external-resource warning (host not on allowlist) -->
+  <link rel="stylesheet" href="https://example.com/random.css">
+
+  <style>
+    /* Two uncommented --accent declarations — one-accent violation. */
+    :root {
+      --accent: #2563EB;
+      --accent: #EA580C;
+      --bg: #FAFAFA;
+      --text: #0A0A0A;
+    }
+
+    /* palette-vars violations — hex codes outside :root */
+    body { color: #123456; background: var(--bg); }
+    h1   { color: #abcdef; }
+
+    /* spacing-scale violations — 17px and 30px are not on the scale */
+    .card  { padding: 17px; margin-top: 30px; gap: 5px; }
+    .stack { padding-block: 14px; }
+
+    /* No :focus-visible rule — focus-visible violation. */
+    /* No prefers-reduced-motion override — reduced-motion warning. */
+    button { transition: background 200ms ease; }
+  </style>
+</head>
+<body>
+  <!-- no-emoji violation — real emoji glyph -->
+  <h1>Welcome 🚀 to the broken fixture</h1>
+
+  <!-- branding violations — no GitHub / Twitter / LinkedIn links -->
+  <p>No branding links anywhere on this page.</p>
+</body>
+</html>

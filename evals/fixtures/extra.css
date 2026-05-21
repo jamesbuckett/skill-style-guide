@@ -1,0 +1,2 @@
+/* Deliberate sibling .css file — triggers validate.mjs `single-file` rule. */
+.dummy { color: red; }

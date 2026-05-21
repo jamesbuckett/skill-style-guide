@@ -75,14 +75,16 @@ You should see `skill-style-guide` listed with its trigger description. If it do
 
 ### Per-project setup (one-time)
 
-The first time you use the skill in a project, install Playwright so the screenshot harness can run:
+The first time you use the skill in a project, install Playwright (for the screenshot harness) and `@axe-core/playwright` (for the optional accessibility scan):
 
 ```bash
 cd <your-project>
 npm init -y
-npm install --save-dev playwright
+npm install --save-dev playwright @axe-core/playwright
 npx playwright install chromium
 ```
+
+`@axe-core/playwright` is optional — the screenshot harness and the static linter work without it. Skip it if you only want the visual check.
 
 If `npx playwright install chromium` fails on your host (known broken on Ubuntu ARM64), see the **When `npx playwright install chromium` fails** section in [`SKILL.md`](SKILL.md) for fallbacks — the harness works with system chromium or an external CDP endpoint.
 
@@ -94,12 +96,21 @@ Once installed, open Claude Code inside any project and prompt:
 > build me a landing page for a small Postgres consultancy
 ```
 
-Claude scaffolds `index.html` from the bundled starter template, applies the design rules in `SKILL.md`, then runs the Playwright harness to capture screenshots for review:
+Claude scaffolds `index.html` from the bundled starter template, applies the design rules in `SKILL.md`, then runs the validation tooling to check the result:
 
 ```bash
-node screenshot.mjs                 # captures mobile / tablet / desktop into screenshots/
-node screenshot.mjs --mode=dark     # capture the dark-mode variant
+# Static linter — encodes the design rules as exit-coded checks (no deps).
+node ~/.claude/skills/skill-style-guide/scripts/validate.mjs ./index.html
+
+# Playwright screenshot harness — mobile / tablet / desktop into screenshots/.
+node ~/.claude/skills/skill-style-guide/scripts/screenshot.mjs ./index.html
+node ~/.claude/skills/skill-style-guide/scripts/screenshot.mjs --mode=dark
+
+# Optional axe-core WCAG AA scan + dark-mode parity probe.
+node ~/.claude/skills/skill-style-guide/scripts/a11y.mjs ./index.html
 ```
+
+The scripts live in `~/.claude/skills/skill-style-guide/scripts/` so the skill update path (`git pull`) keeps the validators in sync. Don't copy them per-project.
 
 ### Trigger phrases
 
@@ -123,9 +134,15 @@ skill-style-guide/
 │   ├── lucide-icons.md               # copy-paste Lucide SVG snippets
 │   └── long-form-components.md       # callouts, comparison tables, glossary, TOC, diagram frames
 ├── scripts/
-│   └── screenshot.mjs                # Playwright harness for mobile / tablet / desktop capture
+│   ├── screenshot.mjs                # Playwright harness for mobile / tablet / desktop capture
+│   ├── validate.mjs                  # static linter — enforces design rules, zero deps
+│   ├── a11y.mjs                      # axe-core WCAG AA scan + dark-mode parity probe
+│   ├── run-evals.mjs                 # skill maintainer harness — runs evals end-to-end
+│   └── _launch.mjs                   # shared Chromium launcher (internal)
 └── evals/
-    └── evals.json                    # skill evaluation prompts and expected outputs
+    ├── evals.json                    # skill evaluation prompts and expected outputs
+    ├── fixtures/                     # broken-on-purpose HTML for validator smoke tests
+    └── results/                      # per-run reports from scripts/run-evals.mjs (gitignored)
 ```
 
 ## Updating
