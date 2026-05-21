@@ -47,16 +47,21 @@ Read these before writing CSS. They override default 2025 design instincts.
 - **No gradient hero backgrounds.** No drop-shadow halos. No purple. Crisp 1px borders and a single soft elevation shadow are enough.
 
 ### Palette (light, defined as CSS variables in the template)
-- `--bg` near-white (`#FAFAFA`)
-- `--surface` pure white (`#FFFFFF`) for cards and elevated panels
-- `--text` near-black (`#0A0A0A`)
-- `--text-muted` mid-gray (`#6B7280`)
-- `--border` light gray (`#E5E7EB`)
-- `--accent` exactly **one** restrained colour — pick from the curated set commented in the template (blue, emerald, or warm orange). Adding a second accent dilutes hierarchy; don't.
+
+**Source of truth.** Both palettes (light + dark), the spacing scale, and the curated accent alternatives live in `palette.json` at the root of `skill-build-educational-site`. The standard install symlink resolves it at `~/.claude/skills/skill-build-educational-site/palette.json` — read it for current hex values rather than caching from this SKILL.md. A palette change happens in `palette.json` once and both skills pick it up. The variables below are the **contract** (names + intent); the values in `palette.json` → `palettes.personal-style.light` and `.dark` are the **values**.
+
+- `--bg` near-white background
+- `--surface` pure white for cards and elevated panels
+- `--text` near-black primary text
+- `--text-muted` mid-gray secondary text
+- `--border` light gray hairlines
+- `--border-strong` slightly darker dividers
+- `--accent` exactly **one** restrained colour — pick from the alternatives in `palette.json` → `palettes.personal-style.accent_alternatives` (blue, emerald, or warm orange). Adding a second accent dilutes hierarchy; don't.
+- `--accent-hover` / `--accent-soft` derived from `--accent` via `color-mix()`; do not hand-roll separate hexes.
 
 **Brand accent vs. semantic state colours.** The one-accent rule applies to the *brand* — CTAs, links, highlights, anything that says "this is the page's voice." It does **not** apply to *semantic state* signals (success green, warning amber, danger red) when the content genuinely conveys state — e.g., a security scan with PASS / FAIL rows, a comparison contrasting a deprecated approach with a recommended one, a status badge. State colours should be restrained (one shade each, used only for the affected element + icon), kept separate from the accent variable (introduce `--state-ok`, `--state-warn`, `--state-bad` as needed), and absent from CTAs and headings. If a page has no genuine state to convey, don't reach for them.
 
-The dark palette is the same variables re-assigned under `[data-theme="dark"]`. Use the variables — never hard-code hex in component CSS.
+The dark palette is the same variables re-assigned under `[data-theme="dark"]`, with values in `palette.json` → `palettes.personal-style.dark`. Use the variables — never hard-code hex in component CSS.
 
 ### Typography
 - **Noto Sans** (400 regular, 700 bold) for body and headings, **Noto Sans Mono** for code. Loaded via the Google Fonts `<link>` already in the template head.
@@ -65,7 +70,7 @@ The dark palette is the same variables re-assigned under `[data-theme="dark"]`. 
 - System fonts remain in the stack as fallbacks for offline rendering — keep them.
 
 ### Spacing
-Use the spacing tokens defined in the template: `--space-1` (4px) through `--space-9` (96px), mapped to the 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 px scale. Don't introduce arbitrary values like `padding: 17px` or `margin-top: 30px`. Cramped layouts and wasteful white space are equally bad — the scale is the discipline that prevents both.
+Use the spacing tokens defined in the template: `--space-1` (4px) through `--space-9` (96px), mapped to the 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 px scale. Values live in `palette.json` → `palettes.personal-style.spacing` (same single source as the palette). Don't introduce arbitrary values like `padding: 17px` or `margin-top: 30px`. Cramped layouts and wasteful white space are equally bad — the scale is the discipline that prevents both.
 
 ### Icons
 **Lucide SVG inlined directly into HTML.** Don't load the Lucide CDN script or use icon fonts — paste the SVG markup. Common icons (sun, moon, github, twitter/x, linkedin, chevron, check, arrow, external-link) are in `references/lucide-icons.md` ready to copy. Replace any emoji with the equivalent Lucide glyph; never ship emojis in production output.
