@@ -1,5 +1,5 @@
 # Skill eval artifacts (transient outputs from skill-creator runs)
-.claude/skills/style-guide-workspace/
+.claude/skills/skill-style-guide-workspace/
 
 # Build / dependency outputs
 node_modules/

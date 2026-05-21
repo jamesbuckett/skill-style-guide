@@ -243,7 +243,7 @@ async function captureToggle(page, vp) {
     await page.waitForTimeout(120);
   }
 
-  // Audience switcher, if build-educational-site's .audience-switch is present.
+  // Audience switcher, if skill-build-educational-site's .audience-switch is present.
   const practitionerRadio = await page.$('.audience-switch [data-audience="practitioner"]');
   if (practitionerRadio) {
     await practitionerRadio.click();
