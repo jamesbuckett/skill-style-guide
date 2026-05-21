@@ -1,5 +1,5 @@
 ---
-name: style-guide
+name: skill-style-guide
 description: Build single-file HTML pages that follow James Buckett's personal style guide — light theme with dark-mode toggle, Noto Sans / Noto Sans Mono typography, Lucide icons inlined as SVG, a disciplined 4/8/12/16/24/32/48/64 spacing scale, exactly one accent color, personal branding links, and Playwright screenshot validation across mobile/tablet/desktop. Use this skill whenever the user asks for a landing page, marketing page, prototype, mockup, single-file HTML page, or to edit an existing index.html in this project, even when they don't explicitly mention the style guide. Skip only if the user explicitly wants a multi-file build (React, Vue, Next, etc.).
 ---
 
