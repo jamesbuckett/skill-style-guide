@@ -20,7 +20,7 @@ Skip when the user explicitly asks for a multi-file framework build (React, Vue,
 
 ## Composition with other skills
 
-This skill is the **visual chassis** — palette, typography, spacing, components, the screenshot harness. When another skill applies to the same task (most commonly `build-educational-site` for long-form explainer pages), use this composition rule:
+This skill is the **visual chassis** — palette, typography, spacing, components, the screenshot harness. When another skill applies to the same task (most commonly `skill-build-educational-site` for long-form explainer pages), use this composition rule:
 
 - This skill wins on **palette, typography, spacing, components, icons, and validation**. The other skill's design system is overridden when it conflicts.
 - The other skill wins on **content architecture** — section sequence, audience switching, glossary discipline, comparison-table rule, regulatory-callout shape.

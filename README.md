@@ -9,7 +9,7 @@
 
 ## About
 
-Turns a one-line request like *"build me a landing page"* into a single, self-contained `index.html` — Noto Sans typography, a 4/8/12/16/24/32 spacing scale, inlined Lucide icons, exactly one accent colour, light theme with dark-mode toggle. Validates every page visually with a Playwright screenshot harness across mobile (375px), tablet (768px), and desktop (1440px) before reporting done. Composes with the `build-educational-site` skill for long-form explainer pages.
+Turns a one-line request like *"build me a landing page"* into a single, self-contained `index.html` — Noto Sans typography, a 4/8/12/16/24/32 spacing scale, inlined Lucide icons, exactly one accent colour, light theme with dark-mode toggle. Validates every page visually with a Playwright screenshot harness across mobile (375px), tablet (768px), and desktop (1440px) before reporting done. Composes with the [`skill-build-educational-site`](https://github.com/jamesbuckett/skill-build-educational-site) skill for long-form explainer pages.
 
 ## Prerequisites
 
