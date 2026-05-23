@@ -417,13 +417,15 @@ ul.reading .note {
 
 Primary sources only — specs, regulator publications, original papers. Skip blog posts, vendor marketing, and Wikipedia summaries.
 
-## Sticky left-side TOC
+## Sticky left-side TOC (scroll-revealed)
 
-For long-form pages (six or more sections, or scrolls past three viewport heights on desktop) running a centered narrow container, a sticky left-side TOC orients the reader and supports in-page jumps. It anchors into the left whitespace that exists when the container is narrower than the viewport, and hides on smaller viewports so it doesn't crowd the narrow text column.
+For long-form pages (six or more sections, or scrolls past three viewport heights on desktop) running a centered container, a left-side TOC orients the reader and supports in-page jumps. It anchors into the left whitespace that exists when the container is narrower than the viewport, and hides on smaller viewports so it doesn't crowd the text column.
 
-**Prerequisite — every top-level `<section>` on the page must use the narrow container.** The TOC's `left` math reserves a fixed-width gutter on the assumption that the visible content column matches the narrow width. Any section that falls back to the default `--max-width` will slide leftward into that gutter and underlap the TOC at `>=1280px`. Apply `.section-narrow` (the Section variants block earlier in this file) to *every* `<section>`, including the hero — it is easy to miss because the hero is usually authored last and visually distinct. Safer alternative for pages where no section needs the wider default: drop `.section-narrow` and apply the narrow width to `.container` directly, so it can't be skipped by forgetting a class.
+**The TOC stays hidden while the reader is on the hero**, then fades in from the left once the hero scrolls out of view. Scroll back to the top and it fades out again. This keeps the reading frame quiet during the initial hook and only surfaces navigation once the reader is committed to the body — a sticky nav stack at the top of the page would compete with the H1 for attention.
 
-Uses `IntersectionObserver` to highlight the section currently in view. The `scroll-margin-top` rule on `section` is load-bearing — without it, clicking a TOC link scrolls the section heading directly under the sticky header.
+**Prerequisite — every top-level `<section>` on the page must use the narrow container.** The TOC's `left` math reserves a fixed-width gutter on the assumption that the visible content column matches the narrow width. Any section that falls back to the default `--max-width` (now `1280px`) will slide leftward into that gutter and underlap the TOC at `>=1280px` viewports. Apply `.section-narrow` (the Section variants block earlier in this file) to *every* `<section>`, including the hero — it is easy to miss because the hero is usually authored last and visually distinct. Safer alternative for pages where no section needs the wider default: drop `.section-narrow` and apply the narrow width to `.container` directly, so it can't be skipped by forgetting a class.
+
+Two `IntersectionObserver`s carry the behaviour: one watches the `.hero` element to toggle the reveal class, the other watches the linked sections to highlight the one currently in view. If your intro uses a different class than `.hero`, change the selector in the JS — or omit a hero entirely and the `scrollY` fallback will reveal the TOC after a short scroll. The `scroll-margin-top` rule on `section` is load-bearing — without it, clicking a TOC link scrolls the section heading directly under the sticky header.
 
 ```css
 .toc {
@@ -436,8 +438,18 @@ Uses `IntersectionObserver` to highlight the section currently in view. The `scr
   overflow-y: auto;
   padding: var(--space-4) var(--space-2);
   z-index: 5;
+  /* Scroll-revealed: hidden until the hero scrolls out of view. */
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+  transition: opacity 240ms ease, transform 240ms ease;
 }
 @media (min-width: 1280px) { .toc { display: block; } }
+.toc.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
 .toc-label {
   display: block;
   font-family: var(--font-mono);
@@ -494,6 +506,29 @@ section { scroll-margin-top: 80px; }
 JavaScript (add inside the existing IIFE in the template):
 
 ```js
+const tocEl = document.querySelector('.toc');
+const heroEl = document.querySelector('.hero');
+
+if (tocEl) {
+  const reveal = (on) => tocEl.classList.toggle('is-revealed', on);
+
+  if (heroEl && 'IntersectionObserver' in window) {
+    // Hide the TOC while the hero is in view; reveal once it scrolls out.
+    // rootMargin's top offset matches the sticky header height so the TOC
+    // doesn't flicker as the hero crosses underneath it.
+    const revealObserver = new IntersectionObserver(
+      ([entry]) => reveal(!entry.isIntersecting),
+      { rootMargin: '-80px 0px 0px 0px', threshold: 0 }
+    );
+    revealObserver.observe(heroEl);
+  } else {
+    // Fallback for pages without a .hero: reveal after a small scroll.
+    const onScroll = () => reveal(window.scrollY > 200);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+}
+
 const tocLinks = Array.from(document.querySelectorAll('.toc a'));
 if (tocLinks.length && 'IntersectionObserver' in window) {
   const linkMap = new Map();
