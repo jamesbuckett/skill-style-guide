@@ -56,7 +56,7 @@ Read these before writing CSS. They override default 2025 design instincts.
 - `--text-muted` mid-gray secondary text
 - `--border` light gray hairlines
 - `--border-strong` slightly darker dividers
-- `--accent` exactly **one** restrained colour — pick from the alternatives in `palette.json` → `palettes.personal-style.accent_alternatives` (blue, emerald, or warm orange). Adding a second accent dilutes hierarchy; don't.
+- `--accent` exactly **one** restrained colour — pick from the alternatives in `palette.json` → `palettes.personal-style.accent_alternatives` (blue, indigo, emerald, or warm orange). Adding a second accent dilutes hierarchy; don't.
 - `--accent-hover` / `--accent-soft` derived from `--accent` via `color-mix()`; do not hand-roll separate hexes.
 
 **Brand accent vs. semantic state colours.** The one-accent rule applies to the *brand* — CTAs, links, highlights, anything that says "this is the page's voice." It does **not** apply to *semantic state* signals (success green, warning amber, danger red) when the content genuinely conveys state — e.g., a security scan with PASS / FAIL rows, a comparison contrasting a deprecated approach with a recommended one, a status badge. State colours should be restrained (one shade each, used only for the affected element + icon), kept separate from the accent variable (introduce `--state-ok`, `--state-warn`, `--state-bad` as needed), and absent from CTAs and headings. If a page has no genuine state to convey, don't reach for them.
